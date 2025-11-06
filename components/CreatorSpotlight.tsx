@@ -1,3 +1,4 @@
+
 "use client";
 
 import { GoogleGenAI, Type } from "@google/genai";
@@ -9,7 +10,7 @@ const SparklesIcon = (props: SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"
-    viewBox="0 0 24 24"
+    viewBox="0 0 24"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
@@ -60,7 +61,12 @@ export default function CreatorSpotlight() {
         },
       });
 
-      const jsonString = response.text.trim();
+      const text = response.text;
+      if (!text) {
+        throw new Error("API response did not contain any text.");
+      }
+      
+      const jsonString = text.trim();
       const generatedSpotlight = JSON.parse(jsonString) as Spotlight;
       setSpotlight(generatedSpotlight);
     } catch (e) {
