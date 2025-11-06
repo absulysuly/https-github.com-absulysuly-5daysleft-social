@@ -18,7 +18,7 @@ type NavigationLink = {
 
 const navigationLinks = [
   { label: "Home", href: "/", exact: true },
-  { label: "Roadmap", href: "/roadmap" },
+  { label: "Candidates", href: "/candidates" },
   { label: "Community", href: "/community" },
   { label: "Blog", href: "/blog" },
 ] satisfies ReadonlyArray<NavigationLink>;
