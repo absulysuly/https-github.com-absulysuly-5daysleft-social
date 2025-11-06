@@ -9,6 +9,8 @@
   --text-muted-color: #a0a0a0;
   --border-color: #333;
   --error-color: #dc3545;
+  --info-color: #0d6efd;
+  --info-background-color: rgba(13, 110, 253, 0.1);
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -113,6 +115,48 @@ body {
   background: var(--text-color);
   border-radius: 10px;
 }
+
+/* Agent Instructions Banner */
+.agent-instructions-banner {
+  background-color: var(--info-background-color);
+  border: 1px solid var(--info-color);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.agent-instructions-banner .info-icon {
+  color: var(--info-color);
+  flex-shrink: 0;
+}
+
+.agent-instructions-banner p {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.agent-instructions-banner .dismiss-button {
+  background: none;
+  border: none;
+  color: var(--text-muted-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.agent-instructions-banner .dismiss-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
 
 /* App Layout */
 .container {

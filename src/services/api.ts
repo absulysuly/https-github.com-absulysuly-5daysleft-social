@@ -17,3 +17,15 @@ export async function getStats(): Promise<any> {
     
     return mockStats;
 }
+
+/**
+ * Checks for instructions in a simulated AGENTS.md file.
+ * Returns mock instructions for demonstration.
+ * @returns {Promise<string | null>} A promise that resolves to the instructions or null.
+ */
+export async function getAgentInstructions(): Promise<string | null> {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    // In a real application, you might fetch this from a file or an endpoint.
+    // Returning a string to simulate finding instructions. Return null to simulate no file.
+    return "Remember to use the project's official component library for all new UI elements and follow the established code formatting guidelines.";
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getStats } from './services/api';
+import { getStats, getAgentInstructions } from './services/api';
 import { askGemini } from './services/gemini';
 
 const TopNavBar = () => {
@@ -171,12 +171,50 @@ const ProjectStats = () => {
   );
 };
 
+const AgentInstructions = ({ instructions, onDismiss }: { instructions: string; onDismiss: () => void; }) => {
+  return (
+    <div className="agent-instructions-banner">
+      <div className="info-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </div>
+      <p>{instructions}</p>
+      <button onClick={onDismiss} className="dismiss-button" aria-label="Dismiss instructions">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  );
+}
+
 
 const HomeView = () => {
+  const [agentInstructions, setAgentInstructions] = useState<string | null>(null);
+  const [showInstructions, setShowInstructions] = useState(false);
+
+  useEffect(() => {
+    const fetchInstructions = async () => {
+      const instructions = await getAgentInstructions();
+      if (instructions) {
+        setAgentInstructions(instructions);
+        setShowInstructions(true);
+      }
+    };
+    fetchInstructions();
+  }, []);
+
+  const handleDismissInstructions = () => {
+    setShowInstructions(false);
+  };
+  
   return (
     <>
       <TopNavBar />
       <div className="container">
+        {showInstructions && agentInstructions && (
+          <AgentInstructions
+            instructions={agentInstructions}
+            onDismiss={handleDismissInstructions}
+          />
+        )}
         <header className="app-header">
           <h1>Sunrise23 Project</h1>
           <p>Your project dashboard and AI assistant, counting down to launch.</p>
