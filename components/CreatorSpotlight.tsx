@@ -1,8 +1,6 @@
 
 "use client";
 
-import { GoogleGenAI, Type } from "@google/genai";
-// FIX: Import SVGProps to correctly type SVG component props.
 import { useState, useEffect, useCallback, type SVGProps } from "react";
 
 const SparklesIcon = (props: SVGProps<SVGSVGElement>) => (
@@ -38,37 +36,18 @@ export default function CreatorSpotlight() {
     setIsLoading(true);
     setError(null);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: "Generate an inspiring quote from a fictional creator about their upcoming product launch, and a fictional creator handle. The handle should start with '@'.",
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              quote: {
-                type: Type.STRING,
-                description: "An inspiring quote from a fictional creator about their upcoming product launch.",
-              },
-              handle: {
-                type: Type.STRING,
-                description: "A fictional creator handle, starting with '@'.",
-              },
-            },
-            required: ["quote", "handle"],
-          },
-        },
-      });
-
-      const text = response.text;
-      if (!text) {
-        throw new Error("API response did not contain any text.");
+      const response = await fetch("/api/spotlight");
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.statusText}`);
       }
+      const generatedSpotlight = (await response.json()) as Spotlight;
       
-      const jsonString = text.trim();
-      const generatedSpotlight = JSON.parse(jsonString) as Spotlight;
-      setSpotlight(generatedSpotlight);
+      // Basic validation of the response structure
+      if (generatedSpotlight.quote && generatedSpotlight.handle) {
+        setSpotlight(generatedSpotlight);
+      } else {
+        throw new Error("Received invalid data structure from the server.");
+      }
     } catch (e) {
       console.error(e);
       setError("Failed to generate a new spotlight. Please try again.");
@@ -91,14 +70,14 @@ export default function CreatorSpotlight() {
         ) : error ? (
           <p className="text-sm text-red-400">{error}</p>
         ) : spotlight ? (
-          <>
+          <div key={spotlight.quote} className="animate-fade-in">
             <p className="max-w-2xl text-sm text-neutral-300">
               “{spotlight.quote}”
             </p>
             <span className="mt-4 text-xs uppercase tracking-[0.35em] text-brand-foreground/70">
               — {spotlight.handle}
             </span>
-          </>
+          </div>
         ) : null}
       </div>
 
@@ -106,7 +85,8 @@ export default function CreatorSpotlight() {
         onClick={generateSpotlight}
         disabled={isLoading}
         className="absolute right-6 top-6 rounded-full p-2 text-brand-foreground/70 transition-colors hover:bg-brand/20 hover:text-brand-foreground disabled:cursor-not-allowed disabled:opacity-50"
-        aria-label="Generate new creator spotlight"
+        aria-label={isLoading ? "Generating new creator spotlight" : "Generate new creator spotlight"}
+        aria-busy={isLoading}
       >
         <SparklesIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
       </button>

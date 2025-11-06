@@ -1,6 +1,6 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import CountdownTimer from "@/components/CountdownTimer";
-import CreatorSpotlight from "@/components/CreatorSpotlight";
 
 const launchMilestones = [
   {
@@ -19,6 +19,19 @@ const launchMilestones = [
     eta: "5 days left",
   },
 ];
+
+const CreatorSpotlight = dynamic(() => import("@/components/CreatorSpotlight"), {
+  loading: () => (
+    <section className="relative flex flex-col gap-4 rounded-3xl border border-dashed border-brand/40 bg-brand/5 p-8 text-neutral-200">
+      <h2 className="text-2xl font-semibold text-brand-foreground">Creator spotlight</h2>
+      <div className="flex min-h-[100px] flex-col justify-center">
+        <p className="animate-pulse text-sm text-neutral-300">Generating inspiration...</p>
+      </div>
+    </section>
+  ),
+  ssr: false,
+});
+
 
 export default function Home() {
   return (

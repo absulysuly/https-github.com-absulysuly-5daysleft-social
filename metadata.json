@@ -1,5 +1,5 @@
 {
-  "requestFramePermissions": [],
   "name": "App",
-  "description": ""
+  "description": "",
+  "requestFramePermissions": []
 }
