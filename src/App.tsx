@@ -2,6 +2,87 @@ import React, { useState, useEffect } from 'react';
 import { getStats } from './services/api';
 import { askGemini } from './services/gemini';
 
+const TopNavBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigationLinks = [
+    { href: '#', label: 'Dashboard' },
+    { href: '#', label: 'Roadmap' },
+    { href: '#', label: 'Community' },
+    { href: '#', label: 'Blog' },
+  ];
+
+  return (
+    <nav className="top-nav-bar">
+      <div className="nav-container">
+        <a href="#" className="nav-brand">Sunrise23</a>
+        <div className="nav-links-container">
+          <ul className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
+            {navigationLinks.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className={link.label === 'Dashboard' ? 'active' : ''}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="nav-actions">
+           <a href="#" className="sign-in-button">Sign In</a>
+           <button className="hamburger-menu" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation" aria-expanded={isMenuOpen}>
+             <span/>
+             <span/>
+             <span/>
+           </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+const ProjectCountdown = () => {
+    const calculateTimeLeft = () => {
+        // Set a fixed future date for the countdown
+        const difference = +new Date("2025-01-01T00:00:00") - +new Date();
+        let timeLeft: {[key: string]: number} = {};
+
+        if (difference > 0) {
+            timeLeft = {
+                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                minutes: Math.floor((difference / 1000 / 60) % 60),
+                seconds: Math.floor((difference / 1000) % 60)
+            };
+        }
+        return timeLeft;
+    };
+
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    });
+
+    return (
+        <div className="countdown-timer">
+            {Object.keys(timeLeft).length > 0 ? (
+              Object.entries(timeLeft).map(([unit, value]) => (
+                  <div key={unit} className="countdown-unit">
+                      <span className="countdown-value">{String(value).padStart(2, '0')}</span>
+                      <span className="countdown-label">{unit.toUpperCase()}</span>
+                  </div>
+              ))
+            ) : (
+              <p className="countdown-launched">Project Launched!</p>
+            )}
+        </div>
+    );
+};
+
+
 const GeminiQuery = () => {
   const [prompt, setPrompt] = useState('');
   const [geminiResponse, setGeminiResponse] = useState('');
@@ -93,26 +174,39 @@ const ProjectStats = () => {
 
 const HomeView = () => {
   return (
-    <div className="container">
-      <header className="app-header">
-        <h1>Sunrise23 Project</h1>
-        <p>Your project dashboard and AI assistant.</p>
-      </header>
-      
-      <main>
-        <section className="project-stats-section">
-          <h2>Project Status</h2>
-          <ProjectStats />
-        </section>
-        <section className="ai-section">
-          <GeminiQuery />
-        </section>
-      </main>
+    <>
+      <TopNavBar />
+      <div className="container">
+        <header className="app-header">
+          <h1>Sunrise23 Project</h1>
+          <p>Your project dashboard and AI assistant, counting down to launch.</p>
+          <div className="cta-buttons">
+            <a href="#" className="cta-primary">Join the Waitlist</a>
+            <a href="#" className="cta-secondary">View Roadmap</a>
+          </div>
+        </header>
+        
+        <main>
+          <section className="countdown-section">
+            <h2>LAUNCHING IN</h2>
+            <ProjectCountdown />
+          </section>
 
-      <footer className="app-footer">
-          <p>&copy; 2024 Sunrise23 Project. All rights reserved.</p>
-      </footer>
-    </div>
+          <section className="project-stats-section">
+            <h2>Project Status</h2>
+            <ProjectStats />
+          </section>
+
+          <section className="ai-section">
+            <GeminiQuery />
+          </section>
+        </main>
+
+        <footer className="app-footer">
+            <p>&copy; 2024 Sunrise23 Project. All rights reserved.</p>
+        </footer>
+      </div>
+    </>
   );
 };
 

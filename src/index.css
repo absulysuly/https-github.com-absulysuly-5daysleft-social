@@ -24,6 +24,96 @@ body {
   line-height: 1.6;
 }
 
+/* --- TopNavBar Styles --- */
+.top-nav-bar {
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.nav-container {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: none; /* Hidden on mobile by default */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: var(--text-muted-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+  padding: 0.5rem 0;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  color: var(--primary-color);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sign-in-button {
+  display: none; /* Hide on mobile by default */
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.sign-in-button:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 20;
+}
+
+.hamburger-menu span {
+  width: 24px;
+  height: 2px;
+  background: var(--text-color);
+  border-radius: 10px;
+}
+
 /* App Layout */
 .container {
   max-width: 960px;
@@ -33,7 +123,6 @@ body {
 
 .app-header {
   text-align: center;
-  border-bottom: 1px solid var(--border-color);
   padding-bottom: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -53,10 +142,13 @@ body {
   color: var(--text-muted-color);
   margin: 0;
   font-size: 1.1rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 main > section {
-    margin-bottom: 3rem;
+    margin-bottom: 4rem;
 }
 
 h2 {
@@ -64,6 +156,83 @@ h2 {
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.5rem;
     margin-bottom: 1.5rem;
+}
+
+/* Header CTA Styles */
+.cta-buttons {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.cta-primary, .cta-secondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.cta-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(245, 124, 0, 0.2);
+}
+
+.cta-primary:hover {
+  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 124, 0, 0.3);
+}
+
+.cta-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted-color);
+}
+
+.cta-secondary:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Countdown Styles */
+.countdown-section h2 {
+    text-align: center;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    color: var(--text-muted-color);
+    margin-bottom: 1.5rem;
+    border-bottom: none;
+}
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.countdown-unit .countdown-value {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1;
+}
+
+.countdown-unit .countdown-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted-color);
+  letter-spacing: 1px;
+}
+
+.countdown-launched {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 /* Project Stats Section */
@@ -200,4 +369,32 @@ h2 {
     padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
     color: var(--text-muted-color);
+}
+
+/* Media Query for Desktop Nav */
+@media (min-width: 768px) {
+  .hamburger-menu {
+    display: none;
+  }
+  .nav-links {
+    display: flex;
+  }
+  .sign-in-button {
+    display: inline-flex;
+  }
+}
+
+/* Styles for Mobile Menu (when open) */
+.nav-links.open {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-color);
+  position: absolute;
+  top: 64px;
+  left: 0;
+  width: 100%;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  gap: 1rem;
 }
