@@ -30,7 +30,7 @@ function normalizePathname(path: string): string {
 
 export default function TopNavBar(): JSX.Element {
   const pathnameValue = usePathname();
-  const normalizedPathname = useMemo(
+  const pathname = useMemo(
     () => normalizePathname(pathnameValue ?? "/"),
     [pathnameValue],
   );
