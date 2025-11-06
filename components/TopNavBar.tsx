@@ -22,8 +22,6 @@ const navigationLinks: ReadonlyArray<NavigationLink> = [
   { label: "Blog", href: "/blog" },
 ];
 
-// FIX: Removed explicit return type 'JSX.Element' to resolve 'Cannot find namespace JSX' error.
-// The return type is correctly inferred by TypeScript.
 export default function TopNavBar() {
   const pathname = usePathname();
 
