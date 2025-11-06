@@ -37,11 +37,11 @@ export default function TopNavBar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center bg-neutral-950/60 backdrop-blur-md">
       <nav className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-brand-foreground">
+        <Link href="/" className="flex items-center gap-3 text-lg font-semibold text-brand-foreground">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground">
-            5D
+            CH
           </span>
-          5DaysLeft
+          Creator Hub
         </Link>
         <ul className="hidden items-center gap-1 rounded-full border border-neutral-800 bg-neutral-900/60 p-1 text-sm text-neutral-300 shadow-lg shadow-black/10 md:flex">
           {navigationLinks.map(({ href, label, exact }) => {

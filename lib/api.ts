@@ -1,9 +1,9 @@
 // lib/api.ts
 import type { Candidate } from "./types";
 
-// This URL should be in a .env.local file as NEXT_PUBLIC_API_BASE_URL
-// For this exercise, it's hardcoded as you've provided.
-const API_BASE_URL = "https://hamlet-unified-complete-2027-production.up.railway.app";
+// Use the environment variable for the API base URL.
+// This is a more robust and secure approach than hardcoding.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 type CandidatesResponse = {
   success: boolean;
@@ -17,6 +17,10 @@ type CandidatesResponse = {
 };
 
 export async function getCandidates(page = 1, limit = 10): Promise<CandidatesResponse> {
+  if (!API_BASE_URL) {
+    throw new Error("API base URL is not configured. Please check your environment variables.");
+  }
+
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),

@@ -34,6 +34,9 @@ const CreatorSpotlight = dynamic(() => import("@/components/CreatorSpotlight"), 
 
 
 export default function Home() {
+  // Feature flag to conditionally render the Creator Spotlight
+  const showCreatorSpotlight = process.env.NEXT_PUBLIC_ENABLE_AI_SPOTLIGHT === 'true';
+
   return (
     <div className="flex flex-col gap-12">
       <header className="flex flex-col items-center gap-6 text-balance text-center">
@@ -76,7 +79,7 @@ export default function Home() {
         ))}
       </section>
 
-      <CreatorSpotlight />
+      {showCreatorSpotlight && <CreatorSpotlight />}
     </div>
   );
 }
