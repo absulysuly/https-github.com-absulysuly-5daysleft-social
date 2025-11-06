@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import CreatorSpotlight from "@/components/CreatorSpotlight";
+
 const launchMilestones = [
   {
     title: "Design Sprint",
@@ -61,16 +63,7 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="flex flex-col gap-4 rounded-3xl border border-dashed border-brand/40 bg-brand/5 p-8 text-neutral-200">
-        <h2 className="text-2xl font-semibold text-brand-foreground">Creator spotlight</h2>
-        <p className="max-w-2xl text-sm text-neutral-300">
-          “I’ve never felt more supported leading up to a launch. The countdown keeps the hype
-          alive, and the community keeps me accountable.”
-        </p>
-        <span className="text-xs uppercase tracking-[0.35em] text-brand-foreground/70">
-          — @futurewave
-        </span>
-      </section>
+      <CreatorSpotlight />
     </div>
   );
 }
