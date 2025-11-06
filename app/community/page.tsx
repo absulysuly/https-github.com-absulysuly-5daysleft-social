@@ -1,51 +1,10 @@
 "use client";
 
-import { useState, type FormEvent, type FC } from "react";
+import { useState, useEffect, type FormEvent, type FC } from "react";
 import { HeartIcon, MessageCircleIcon, Share2Icon } from "@/components/Icons";
-
-type Post = {
-  id: number;
-  author: {
-    name: string;
-    handle: string;
-    avatarColor: string;
-  };
-  content: string;
-  timestamp: string;
-};
-
-const initialPosts: Post[] = [
-  {
-    id: 1,
-    author: {
-      name: "Elena Vox",
-      handle: "@elenavox",
-      avatarColor: "bg-purple-500",
-    },
-    content: "Just pushed the final designs for Project Nova. The launch is getting so close I can taste it! So excited to share this with you all. #gamedev #design",
-    timestamp: "2h ago",
-  },
-  {
-    id: 2,
-    author: {
-      name: "Sam K.",
-      handle: "@samk_dev",
-      avatarColor: "bg-sky-500",
-    },
-    content: "Debugging a tricky state management issue in the new creator dashboard. It's moments like these that make the final product feel so rewarding. Almost there!",
-    timestamp: "5h ago",
-  },
-  {
-    id: 3,
-    author: {
-      name: "Aisha Labs",
-      handle: "@aishalabs",
-      avatarColor: "bg-emerald-500",
-    },
-    content: "Beta feedback has been incredible. Thank you to our early adopters for the detailed insights. We're already implementing some of your suggestions for V1.",
-    timestamp: "1d ago",
-  },
-];
+import { getPosts, createPost, likePost } from "@/lib/api";
+import type { Post } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const UserAvatar = ({ author }: { author: Post["author"] }) => (
   <div
@@ -55,44 +14,76 @@ const UserAvatar = ({ author }: { author: Post["author"] }) => (
   </div>
 );
 
-// FIX: Explicitly type PostCard as a React.FC to resolve incorrect 'key' prop error.
-const PostCard: FC<{ post: Post }> = ({ post }) => (
-  <article className="animate-fade-in flex gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 shadow-inner shadow-black/10">
-    <UserAvatar author={post.author} />
-    <div className="flex w-full flex-col gap-3">
-      <div className="flex items-baseline gap-2">
-        <span className="font-semibold text-neutral-50">{post.author.name}</span>
-        <span className="text-sm text-neutral-400">{post.author.handle}</span>
-        <span className="text-sm text-neutral-500">·</span>
-        <span className="text-sm text-neutral-500">{post.timestamp}</span>
-      </div>
-      <p className="text-neutral-300">{post.content}</p>
-      <div className="mt-2 flex items-center gap-6 text-neutral-400">
-        <button className="flex items-center gap-2 transition-colors hover:text-brand">
-          <MessageCircleIcon className="h-4 w-4" />
-          <span className="text-sm">12</span>
-        </button>
-        <button className="flex items-center gap-2 transition-colors hover:text-red-500">
-          <HeartIcon className="h-4 w-4" />
-          <span className="text-sm">45</span>
-        </button>
-        <button className="transition-colors hover:text-green-500">
-          <Share2Icon className="h-4 w-4" />
-        </button>
-      </div>
-    </div>
-  </article>
-);
+const PostCard: FC<{ post: Post; onLike: (postId: string) => void }> = ({ post, onLike }) => {
+  const timeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + "y ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + "mo ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + "d ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + "h ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + "m ago";
+    return Math.floor(seconds) + "s ago";
+  };
 
-const CreatePost = ({ onAddPost }: { onAddPost: (content: string) => void }) => {
+  return (
+    <article className="animate-fade-in flex gap-4 rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 shadow-inner shadow-black/10">
+      <UserAvatar author={post.author} />
+      <div className="flex w-full flex-col gap-3">
+        <div className="flex items-baseline gap-2">
+          <span className="font-semibold text-neutral-50">{post.author.name}</span>
+          <span className="text-sm text-neutral-400">{post.author.handle}</span>
+          <span className="text-sm text-neutral-500">·</span>
+          <span className="text-sm text-neutral-500">{timeAgo(post.createdAt)}</span>
+        </div>
+        <p className="text-neutral-300 whitespace-pre-wrap">{post.content}</p>
+        <div className="mt-2 flex items-center gap-6 text-neutral-400">
+          <button className="flex items-center gap-2 transition-colors hover:text-brand">
+            <MessageCircleIcon className="h-4 w-4" />
+            <span className="text-sm">{post.commentsCount}</span>
+          </button>
+          <button
+            onClick={() => onLike(post.id)}
+            className={cn(
+              "flex items-center gap-2 transition-colors",
+              post.isLiked ? "text-red-500" : "hover:text-red-500"
+            )}
+            aria-label={post.isLiked ? "Unlike post" : "Like post"}
+          >
+            <HeartIcon className={cn("h-4 w-4", post.isLiked && "fill-current")} />
+            <span className="text-sm">{post.likesCount}</span>
+          </button>
+          <button className="transition-colors hover:text-green-500">
+            <Share2Icon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const CreatePost = ({ onAddPost }: { onAddPost: (content: string) => Promise<void> }) => {
   const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  {/* FIX: Use FormEvent type from react import instead of React.FormEvent namespace */}
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (content.trim()) {
-      onAddPost(content);
-      setContent("");
+    if (content.trim() && !isSubmitting) {
+      setIsSubmitting(true);
+      try {
+        await onAddPost(content);
+        setContent("");
+      } catch (error) {
+        // In a real app, you'd show a toast notification here
+        console.error("Failed to create post:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -111,10 +102,10 @@ const CreatePost = ({ onAddPost }: { onAddPost: (content: string) => void }) => 
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={!content.trim()}
+          disabled={!content.trim() || isSubmitting}
           className="rounded-full bg-brand px-6 py-2 text-sm font-medium text-brand-foreground shadow-lg shadow-brand/30 transition hover:bg-brand/90 disabled:cursor-not-allowed disabled:bg-brand/40 disabled:shadow-none"
         >
-          Post
+          {isSubmitting ? "Posting..." : "Post"}
         </button>
       </div>
     </form>
@@ -122,24 +113,76 @@ const CreatePost = ({ onAddPost }: { onAddPost: (content: string) => void }) => 
 };
 
 export default function CommunityPage() {
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddPost = (content: string) => {
-    const newPost: Post = {
-      id: Date.now(),
-      author: {
-        name: "You",
-        handle: "@creator",
-        avatarColor: "bg-brand",
-      },
-      content,
-      timestamp: "Just now",
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await getPosts(page);
+        setPosts(response.data);
+        setTotalPages(response.pagination.pages);
+      } catch (e) {
+        setError("Failed to load posts. The backend might be offline.");
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setPosts([newPost, ...posts]);
+    fetchPosts();
+  }, [page]);
+
+  const handleAddPost = async (content: string) => {
+    try {
+      const response = await createPost(content);
+      // Add the new post to the top of the list
+      setPosts((prevPosts) => [response.data, ...prevPosts]);
+    } catch (error) {
+      console.error("Failed to add post:", error);
+      // Re-throw to be caught in the form component for UI feedback
+      throw error;
+    }
+  };
+  
+  const handleLikePost = (postId: string) => {
+    // Optimistic UI update
+    setPosts(posts.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          isLiked: !p.isLiked,
+          likesCount: p.isLiked ? p.likesCount - 1 : p.likesCount + 1
+        };
+      }
+      return p;
+    }));
+
+    // Send request to the server
+    likePost(postId).catch(() => {
+      // Revert on failure
+      setPosts(posts.map(p => {
+        if (p.id === postId) {
+          return {
+            ...p,
+            isLiked: !p.isLiked,
+            likesCount: p.isLiked ? p.likesCount - 1 : p.likesCount + 1
+          };
+        }
+        return p;
+      }));
+    });
   };
 
+  const handlePrevPage = () => setPage((p) => Math.max(1, p - 1));
+  const handleNextPage = () => setPage((p) => Math.min(totalPages, p + 1));
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 animate-fade-in">
       <header>
         <h1 className="text-4xl font-semibold sm:text-5xl">Community Feed</h1>
         <p className="mt-2 max-w-2xl text-lg text-neutral-400">
@@ -149,11 +192,37 @@ export default function CommunityPage() {
 
       <CreatePost onAddPost={handleAddPost} />
 
-      <div className="flex flex-col gap-6">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
+      {isLoading && <p className="text-center text-neutral-400">Loading posts...</p>}
+      {error && <p className="text-center text-red-400">{error}</p>}
+
+      {!isLoading && !error && (
+        <>
+          <div className="flex flex-col gap-6">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} onLike={handleLikePost} />
+            ))}
+          </div>
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={handlePrevPage}
+              disabled={page === 1}
+              className="rounded-full border border-neutral-700 px-6 py-2 text-sm font-medium text-neutral-200 transition hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-neutral-400">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalPages}
+              className="rounded-full border border-neutral-700 px-6 py-2 text-sm font-medium text-neutral-200 transition hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

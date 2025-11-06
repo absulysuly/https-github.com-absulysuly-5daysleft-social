@@ -1,4 +1,25 @@
 // lib/types.ts
+
+// == Base Types ==
+export type User = {
+  id: string;
+  name: string;
+  handle: string;
+  avatarColor: string;
+};
+
+export type Post = {
+  id: string;
+  author: User;
+  content: string;
+  likesCount: number;
+  commentsCount: number;
+  createdAt: string; // ISO date string
+  isLiked: boolean; // Indicates if the current user has liked this post
+};
+
+
+// == Candidate Types ==
 export type Candidate = {
   id: string;
   uniqueCandidateId: string;
