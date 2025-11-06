@@ -22,7 +22,7 @@ const navigationLinks: ReadonlyArray<NavigationLink> = [
   { label: "Blog", href: "/blog" },
 ];
 
-const TopNavBar = () => {
+export default function TopNavBar(): JSX.Element {
   const pathname = usePathname();
 
   return (
@@ -65,6 +65,4 @@ const TopNavBar = () => {
       </nav>
     </header>
   );
-};
-
-export default TopNavBar;
+}
