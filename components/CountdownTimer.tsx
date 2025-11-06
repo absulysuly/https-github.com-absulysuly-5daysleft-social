@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // A real-world application should use a fixed UTC date from a server/environment variable.
 // For this example, we'll set it 5 days from the moment the component first renders.
@@ -13,7 +13,7 @@ const getLaunchDate = () => {
 const CountdownTimer = () => {
   const [launchDate] = useState(getLaunchDate());
 
-  const calculateTimeLeft = () => {
+  const calculateTimeLeft = useCallback(() => {
     const difference = +launchDate - +new Date();
     let timeLeft: { [key: string]: number } = {};
 
@@ -27,7 +27,7 @@ const CountdownTimer = () => {
     }
 
     return timeLeft;
-  };
+  }, [launchDate]);
 
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft());
 
@@ -38,7 +38,7 @@ const CountdownTimer = () => {
 
     // Clear the interval on component unmount
     return () => clearInterval(timer);
-  }, [launchDate]);
+  }, [calculateTimeLeft]);
 
   const timerComponents = Object.entries(timeLeft).map(([interval, value]) => (
     <div key={interval} className="flex flex-col items-center">
@@ -53,7 +53,7 @@ const CountdownTimer = () => {
 
   return (
     <div className="flex w-full justify-center gap-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 p-6 shadow-inner shadow-black/10 sm:gap-8">
-      {timerComponents.length ? timerComponents : <span className="text-2xl font-bold text-brand">We've Launched!</span>}
+      {timerComponents.length ? timerComponents : <span className="text-2xl font-bold text-brand">We&apos;ve Launched!</span>}
     </div>
   );
 };
